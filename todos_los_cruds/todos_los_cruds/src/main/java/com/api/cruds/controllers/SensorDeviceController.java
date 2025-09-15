@@ -54,14 +54,14 @@ public class SensorDeviceController {
 
             if (!result.isEmpty()) {
                 String adminEfectivo = result.get(0);
-                System.out.println("🔧 DEBUG: Usuario " + userEmail + " -> Admin efectivo: " + adminEfectivo);
+                System.out.println("DEBUG: Usuario " + userEmail + " -> Admin efectivo: " + adminEfectivo);
                 return adminEfectivo;
             } else {
-                System.out.println("⚠️ DEBUG: Usuario " + userEmail + " sin admin efectivo");
+                System.out.println("DEBUG: Usuario " + userEmail + " sin admin efectivo");
                 return null;
             }
         } catch (Exception e) {
-            System.out.println("❌ ERROR obteniendo admin efectivo: " + e.getMessage());
+            System.out.println("ERROR obteniendo admin efectivo: " + e.getMessage());
             return null;
         }
     }
@@ -75,15 +75,14 @@ public class SensorDeviceController {
                 """;
 
             Boolean tieneAcceso = jdbcTemplate.queryForObject(sql, Boolean.class, userEmail);
-            System.out.println("🔧 DEBUG: Usuario " + userEmail + " tiene acceso: " + tieneAcceso);
+            System.out.println("DEBUG: Usuario " + userEmail + " tiene acceso: " + tieneAcceso);
             return tieneAcceso != null && tieneAcceso;
         } catch (Exception e) {
-            System.out.println("❌ ERROR verificando acceso: " + e.getMessage());
+            System.out.println("ERROR verificando acceso: " + e.getMessage());
             return false;
         }
     }
 
-    // 🔧 ENDPOINT CORREGIDO: Registro inicial del dispositivo
     @PostMapping("/sensor-data/register")
     public ResponseEntity<Map<String, Object>> registerDevice(@RequestBody DeviceRegistrationRequest request) {
         System.out.println("=== REGISTER DEVICE DEBUG ===");
@@ -111,7 +110,7 @@ public class SensorDeviceController {
                     device.setDeviceName(request.getDeviceName());
                 }
 
-                System.out.println("✅ Dispositivo existente actualizado: " + device.getId());
+                System.out.println("Dispositivo existente actualizado: " + device.getId());
             } else {
                 // Crear nuevo dispositivo
                 device = new Device();
@@ -120,7 +119,7 @@ public class SensorDeviceController {
                 device.setChipId(request.getChipId());
                 device.setDeviceName(request.getDeviceName() != null ? request.getDeviceName() : "ESP32-" + request.getDeviceCode());
                 device.setLastSeen(new Date());
-                System.out.println("✅ Creando nuevo dispositivo");
+                System.out.println("Creando nuevo dispositivo");
             }
 
             device = deviceRepository.save(device);
@@ -131,27 +130,26 @@ public class SensorDeviceController {
             response.put("deviceCode", device.getDeviceCode());
             response.put("message", "Dispositivo registrado correctamente");
 
-            // 🔧 FIX CRÍTICO: Verificar vinculación y devolver token si está vinculado
             if (device.getUser() != null) {
                 String token = jwtUtil.generateToken(device.getUser().getEmail());
                 response.put("userToken", token);
                 response.put("linked", true);
                 response.put("status", "LINKED");
-                System.out.println("🎉 Dispositivo ya vinculado a: " + device.getUser().getEmail());
-                System.out.println("🔑 Token generado y enviado");
+                System.out.println("Dispositivo ya vinculado a: " + device.getUser().getEmail());
+                System.out.println("Token generado y enviado");
             } else {
                 response.put("userToken", null);
                 response.put("linked", false);
                 response.put("status", "PENDING");
                 response.put("linkCode", device.getDeviceCode());
-                System.out.println("⏳ Dispositivo no vinculado, código: " + device.getDeviceCode());
+                System.out.println("Dispositivo no vinculado, código: " + device.getDeviceCode());
             }
 
-            System.out.println("📡 Respuesta enviada: " + response);
+            System.out.println("Respuesta enviada: " + response);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            System.out.println("❌ ERROR en register: " + e.getMessage());
+            System.out.println("ERROR en register: " + e.getMessage());
             e.printStackTrace();
 
             Map<String, Object> errorResponse = new HashMap<>();
@@ -164,7 +162,6 @@ public class SensorDeviceController {
         }
     }
 
-    // 🔧 ENDPOINT MEJORADO: Recibir datos de sensores
     @PostMapping("/sensor-data")
     public ResponseEntity<String> receiveSensorData(
             @RequestHeader("Authorization") String authHeader,
@@ -174,7 +171,6 @@ public class SensorDeviceController {
         System.out.println("Device Code: " + request.getDeviceCode());
         System.out.println("Auth Header: " + (authHeader != null ? "Present" : "Missing"));
 
-        // ✅ DEBUG: Mostrar todos los datos recibidos
         System.out.println("=== DATOS RECIBIDOS ===");
         System.out.println("temperaturaAmbiente: " + request.getTemperaturaAmbiente());
         System.out.println("humedadAmbiente: " + request.getHumedadAmbiente());
@@ -187,7 +183,7 @@ public class SensorDeviceController {
         try {
             // Validar token
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                System.out.println("❌ Token inválido o faltante");
+                System.out.println("Token inválido o faltante");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token requerido");
             }
 
@@ -198,23 +194,23 @@ public class SensorDeviceController {
                 email = jwtUtil.getUsernameFromToken(token);
                 System.out.println("Email from token: " + email);
             } catch (Exception e) {
-                System.out.println("❌ Error extrayendo email del token: " + e.getMessage());
+                System.out.println("Error extrayendo email del token: " + e.getMessage());
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
             }
 
             Optional<UserModel> userOpt = userRepository.findById(email);
             if (userOpt.isEmpty()) {
-                System.out.println("❌ Usuario no encontrado: " + email);
+                System.out.println("Usuario no encontrado: " + email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado");
             }
 
             UserModel user = userOpt.get();
-            System.out.println("✅ Usuario encontrado: " + user.getEmail());
+            System.out.println("Usuario encontrado: " + user.getEmail());
 
             // Verificar que el dispositivo pertenece al usuario
             Optional<Device> deviceOpt = deviceRepository.findByDeviceCodeAndUser(request.getDeviceCode(), user);
             if (deviceOpt.isEmpty()) {
-                System.out.println("❌ Dispositivo no autorizado: " + request.getDeviceCode());
+                System.out.println("Dispositivo no autorizado: " + request.getDeviceCode());
 
                 // Debug adicional
                 Optional<Device> deviceCheck = deviceRepository.findByDeviceCode(request.getDeviceCode());
@@ -230,35 +226,33 @@ public class SensorDeviceController {
             }
 
             Device device = deviceOpt.get();
-            System.out.println("✅ Dispositivo autorizado: " + device.getDeviceName());
+            System.out.println("Dispositivo autorizado: " + device.getDeviceName());
 
-            // ✅ VALIDACIÓN DE DATOS MEJORADA
             if (request.getTemperaturaAmbiente() == null) {
-                System.out.println("⚠️ temperaturaAmbiente es null, usando valor por defecto");
+                System.out.println("temperaturaAmbiente es null, usando valor por defecto");
                 request.setTemperaturaAmbiente(25.0f);
             }
 
             if (request.getHumedadAmbiente() == null) {
-                System.out.println("⚠️ humedadAmbiente es null, usando valor por defecto");
+                System.out.println("humedadAmbiente es null, usando valor por defecto");
                 request.setHumedadAmbiente(50.0f);
             }
 
             if (request.getTemperaturaSuelo() == null) {
-                System.out.println("⚠️ temperaturaSuelo es null, usando valor por defecto");
+                System.out.println("temperaturaSuelo es null, usando valor por defecto");
                 request.setTemperaturaSuelo(20.0f);
             }
 
             if (request.getHumedadSuelo() == null) {
-                System.out.println("⚠️ humedadSuelo es null, usando valor por defecto");
+                System.out.println("humedadSuelo es null, usando valor por defecto");
                 request.setHumedadSuelo(30.0f);
             }
 
             if (request.getBatteryLevel() == null) {
-                System.out.println("⚠️ batteryLevel es null, usando valor por defecto");
+                System.out.println("batteryLevel es null, usando valor por defecto");
                 request.setBatteryLevel(85.0f);
             }
 
-            // ✅ CREAR DATOS DEL SENSOR CON VALIDACIÓN
             SensorData data = new SensorData();
             data.setDevice(device);
             data.setUser(user);
@@ -284,9 +278,9 @@ public class SensorDeviceController {
             // Guardar en base de datos
             try {
                 data = sensorDataRepository.save(data);
-                System.out.println("✅ Datos guardados con ID: " + data.getId());
+                System.out.println("Datos guardados con ID: " + data.getId());
             } catch (Exception e) {
-                System.out.println("❌ Error guardando en BD: " + e.getMessage());
+                System.out.println("Error guardando en BD: " + e.getMessage());
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("Error guardando datos: " + e.getMessage());
@@ -300,15 +294,15 @@ public class SensorDeviceController {
             // Enviar datos en tiempo real solo al usuario propietario
             try {
                 messagingTemplate.convertAndSend("/topic/sensor-data/" + user.getEmail(), data);
-                System.out.println("📡 Datos enviados por WebSocket a: " + user.getEmail());
+                System.out.println("Datos enviados por WebSocket a: " + user.getEmail());
             } catch (Exception wsError) {
-                System.out.println("⚠️ Error enviando WebSocket: " + wsError.getMessage());
+                System.out.println("Error enviando WebSocket: " + wsError.getMessage());
             }
 
             return ResponseEntity.ok("Datos recibidos y guardados correctamente");
 
         } catch (Exception e) {
-            System.out.println("❌ ERROR procesando datos: " + e.getMessage());
+            System.out.println("ERROR procesando datos: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error interno: " + e.getMessage());
@@ -317,30 +311,29 @@ public class SensorDeviceController {
 
     private Float validateSensorValue(Float value, Float defaultValue) {
         if (value == null || Float.isNaN(value) || Float.isInfinite(value)) {
-            System.out.println("⚠️ Valor de sensor inválido, usando valor por defecto: " + defaultValue);
+            System.out.println("Valor de sensor inválido, usando valor por defecto: " + defaultValue);
             return defaultValue;
         }
 
         // Validar rangos razonables
         if (value < -50 || value > 150) {
-            System.out.println("⚠️ Valor fuera de rango (" + value + "), usando valor por defecto: " + defaultValue);
+            System.out.println("Valor fuera de rango (" + value + "), usando valor por defecto: " + defaultValue);
             return defaultValue;
         }
 
         return value;
     }
 
-    // 🔧 ENDPOINT ACTUALIZADO: Verificar estado del dispositivo
     @GetMapping("/sensor-data/status/{deviceCode}")
     public ResponseEntity<Map<String, Object>> getDeviceStatus(@PathVariable String deviceCode) {
         System.out.println("=== STATUS CHECK DEBUG ===");
-        System.out.println("🔧 Checking device: " + deviceCode);
+        System.out.println("Checking device: " + deviceCode);
 
         try {
             Optional<Device> deviceOpt = deviceRepository.findByDeviceCode(deviceCode);
 
             if (deviceOpt.isEmpty()) {
-                System.out.println("❌ Dispositivo no encontrado: " + deviceCode);
+                System.out.println("Dispositivo no encontrado: " + deviceCode);
 
                 Map<String, Object> notFoundResponse = new HashMap<>();
                 notFoundResponse.put("message", "Dispositivo no encontrado");
@@ -367,8 +360,8 @@ public class SensorDeviceController {
                 response.put("userName", device.getUser().getEmail());
                 response.put("deviceName", device.getDeviceName());
 
-                System.out.println("✅ Dispositivo vinculado a: " + device.getUser().getEmail());
-                System.out.println("🔑 Token generado: " + (token != null ? "Si" : "No"));
+                System.out.println("Dispositivo vinculado a: " + device.getUser().getEmail());
+                System.out.println("Token generado: " + (token != null ? "Si" : "No"));
             } else {
                 response.put("message", "Dispositivo no vinculado");
                 response.put("linked", false);
@@ -376,14 +369,14 @@ public class SensorDeviceController {
                 response.put("status", "PENDING");
                 response.put("deviceCode", device.getDeviceCode());
 
-                System.out.println("⏳ Dispositivo no vinculado");
+                System.out.println("Dispositivo no vinculado");
             }
 
-            System.out.println("📡 Respuesta de status: " + response);
+            System.out.println("Respuesta de status: " + response);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            System.out.println("❌ ERROR en status check: " + e.getMessage());
+            System.out.println("ERROR en status check: " + e.getMessage());
             e.printStackTrace();
 
             Map<String, Object> errorResponse = new HashMap<>();
@@ -413,19 +406,19 @@ public class SensorDeviceController {
 
             Optional<UserModel> userOpt = userRepository.findById(email);
             if (userOpt.isEmpty()) {
-                System.out.println("❌ Usuario no encontrado: " + email);
+                System.out.println("Usuario no encontrado: " + email);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("error", "Usuario no encontrado"));
             }
 
             UserModel user = userOpt.get();
-            System.out.println("✅ Usuario encontrado: " + user.getEmail());
+            System.out.println("Usuario encontrado: " + user.getEmail());
 
             String deviceCode = requestBody.get("deviceCode");
             String deviceName = requestBody.get("deviceName");
 
-            System.out.println("🔧 Device Code: " + deviceCode);
-            System.out.println("🔧 Device Name: " + deviceName);
+            System.out.println("Device Code: " + deviceCode);
+            System.out.println("Device Name: " + deviceName);
 
             if (deviceCode == null || deviceCode.trim().isEmpty()) {
                 return ResponseEntity.badRequest()
@@ -437,23 +430,22 @@ public class SensorDeviceController {
                         .body(Map.of("error", "Nombre de dispositivo requerido"));
             }
 
-            // 🔧 NUEVO: Buscar en todos los dispositivos para debug
-            System.out.println("🔧 DEBUG: Buscando todos los dispositivos en la BD...");
+
+            System.out.println("DEBUG: Buscando todos los dispositivos en la BD...");
             List<Device> allDevices = deviceRepository.findAll();
-            System.out.println("🔧 DEBUG: Total dispositivos en BD: " + allDevices.size());
+            System.out.println("DEBUG: Total dispositivos en BD: " + allDevices.size());
             for (Device d : allDevices) {
-                System.out.println("🔧 DEBUG: Dispositivo encontrado: " + d.getDeviceCode() + " | " + d.getDeviceName());
+                System.out.println("DEBUG: Dispositivo encontrado: " + d.getDeviceCode() + " | " + d.getDeviceName());
             }
 
             // Buscar dispositivo por código (tanto mayúsculas como minúsculas)
-            System.out.println("🔧 DEBUG: Buscando dispositivo con código: " + deviceCode.toUpperCase());
+            System.out.println("DEBUG: Buscando dispositivo con código: " + deviceCode.toUpperCase());
             Optional<Device> deviceOpt = deviceRepository.findByDeviceCode(deviceCode.toUpperCase());
 
             if (deviceOpt.isEmpty()) {
-                System.out.println("❌ Dispositivo no encontrado: " + deviceCode);
+                System.out.println("Dispositivo no encontrado: " + deviceCode);
 
-                // 🔧 NUEVO: Intentar crear el dispositivo si no existe
-                System.out.println("🔧 DEBUG: Intentando crear dispositivo automáticamente...");
+                System.out.println("DEBUG: Intentando crear dispositivo automáticamente...");
 
                 Device newDevice = new Device();
                 newDevice.setDeviceCode(deviceCode.toUpperCase());
@@ -463,7 +455,7 @@ public class SensorDeviceController {
 
                 try {
                     newDevice = deviceRepository.save(newDevice);
-                    System.out.println("✅ Dispositivo creado automáticamente: " + newDevice.getId());
+                    System.out.println("Dispositivo creado automáticamente: " + newDevice.getId());
 
                     return ResponseEntity.ok(Map.of(
                             "success", true,
@@ -477,18 +469,18 @@ public class SensorDeviceController {
                     ));
 
                 } catch (Exception e) {
-                    System.out.println("❌ Error creando dispositivo: " + e.getMessage());
+                    System.out.println("Error creando dispositivo: " + e.getMessage());
                     return ResponseEntity.badRequest()
                             .body(Map.of("error", "Error creando dispositivo: " + e.getMessage()));
                 }
             }
 
             Device device = deviceOpt.get();
-            System.out.println("✅ Dispositivo encontrado: " + device.getId());
+            System.out.println("Dispositivo encontrado: " + device.getId());
 
             // Verificar que no esté ya vinculado
             if (device.getUser() != null) {
-                System.out.println("⚠️ Dispositivo ya vinculado a: " + device.getUser().getEmail());
+                System.out.println("Dispositivo ya vinculado a: " + device.getUser().getEmail());
                 if (device.getUser().getEmail().equals(user.getEmail())) {
                     return ResponseEntity.badRequest()
                             .body(Map.of("error", "Este dispositivo ya está vinculado a tu cuenta"));
@@ -504,7 +496,7 @@ public class SensorDeviceController {
             device.setLastSeen(new Date());
             device = deviceRepository.save(device);
 
-            System.out.println("🎉 Dispositivo vinculado exitosamente");
+            System.out.println("Dispositivo vinculado exitosamente");
 
             return ResponseEntity.ok(Map.of(
                     "success", true,
@@ -518,7 +510,7 @@ public class SensorDeviceController {
             ));
 
         } catch (Exception e) {
-            System.out.println("❌ ERROR en link device: " + e.getMessage());
+            System.out.println("ERROR en link device: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.badRequest().body(Map.of("error", "Error interno: " + e.getMessage()));
         }
@@ -535,21 +527,20 @@ public class SensorDeviceController {
         try {
             String token = authHeader.replace("Bearer ", "");
             String userEmail = jwtUtil.getUsernameFromToken(token);
-            System.out.println("🔧 DEBUG: Usuario del token: " + userEmail);
+            System.out.println("DEBUG: Usuario del token: " + userEmail);
 
-            // ✅ NUEVA LÓGICA: Verificar acceso y obtener admin efectivo
             if (!tieneAccesoADatos(userEmail)) {
-                System.out.println("❌ Usuario sin acceso a datos: " + userEmail);
+                System.out.println("Usuario sin acceso a datos: " + userEmail);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
             String adminEfectivo = getAdminEfectivo(userEmail);
             if (adminEfectivo == null) {
-                System.out.println("❌ No se pudo obtener admin efectivo para: " + userEmail);
+                System.out.println("No se pudo obtener admin efectivo para: " + userEmail);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
-            System.out.println("✅ Buscando datos para admin efectivo: " + adminEfectivo);
+            System.out.println("Buscando datos para admin efectivo: " + adminEfectivo);
 
             Date since = new Date(System.currentTimeMillis() - (hours * 60 * 60 * 1000L));
 
@@ -558,18 +549,18 @@ public class SensorDeviceController {
                 // Buscar por admin efectivo, no por usuario actual
                 data = sensorDataRepository.findByUserEmailAndDeviceCodeAndTimestampAfter(
                         adminEfectivo, deviceCode, since);
-                System.out.println("🔧 DEBUG: Datos para device " + deviceCode + ": " + data.size());
+                System.out.println("DEBUG: Datos para device " + deviceCode + ": " + data.size());
             } else {
                 // Buscar todos los datos del admin efectivo
                 data = sensorDataRepository.findByUserEmailAndTimestampAfter(adminEfectivo, since);
-                System.out.println("🔧 DEBUG: Todos los datos del admin: " + data.size());
+                System.out.println("DEBUG: Todos los datos del admin: " + data.size());
             }
 
-            System.out.println("✅ Retornando " + data.size() + " registros de datos");
+            System.out.println("Retornando " + data.size() + " registros de datos");
             return ResponseEntity.ok(data);
 
         } catch (Exception e) {
-            System.out.println("❌ ERROR en getUserSensorData: " + e.getMessage());
+            System.out.println("ERROR en getUserSensorData: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -583,52 +574,51 @@ public class SensorDeviceController {
         try {
             String token = authHeader.replace("Bearer ", "");
             String userEmail = jwtUtil.getUsernameFromToken(token);
-            System.out.println("🔧 DEBUG: Usuario del token: " + userEmail);
+            System.out.println("DEBUG: Usuario del token: " + userEmail);
 
-            // ✅ NUEVA LÓGICA: Verificar acceso y obtener admin efectivo
+
             if (!tieneAccesoADatos(userEmail)) {
-                System.out.println("❌ Usuario sin acceso a dispositivos: " + userEmail);
+                System.out.println("Usuario sin acceso a dispositivos: " + userEmail);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
             String adminEfectivo = getAdminEfectivo(userEmail);
             if (adminEfectivo == null) {
-                System.out.println("❌ No se pudo obtener admin efectivo para: " + userEmail);
+                System.out.println("No se pudo obtener admin efectivo para: " + userEmail);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
-            System.out.println("✅ Buscando dispositivos para admin efectivo: " + adminEfectivo);
+            System.out.println("Buscando dispositivos para admin efectivo: " + adminEfectivo);
 
             // Buscar dispositivos del admin efectivo, no del usuario actual
             List<Device> devices = deviceRepository.findByUserEmail(adminEfectivo);
-            System.out.println("✅ Dispositivos encontrados: " + devices.size());
+            System.out.println("Dispositivos encontrados: " + devices.size());
 
             return ResponseEntity.ok(devices);
 
         } catch (Exception e) {
-            System.out.println("❌ ERROR en getUserDevices: " + e.getMessage());
+            System.out.println("ERROR en getUserDevices: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    // 🔧 NUEVO ENDPOINT: Obtener últimos datos de un dispositivo específico
+
     @GetMapping("/sensor-data/latest/{deviceCode}")
     public ResponseEntity<SensorData> getLatestSensorData(
             @RequestHeader("Authorization") String authHeader,
             @PathVariable String deviceCode) {
 
         System.out.println("=== GETTING LATEST DATA ===");
-        System.out.println("🔧 Device Code: " + deviceCode);
+        System.out.println("Device Code: " + deviceCode);
 
         try {
             String token = authHeader.replace("Bearer ", "");
             String userEmail = jwtUtil.getUsernameFromToken(token);
             System.out.println("🔧 DEBUG: Usuario del token: " + userEmail);
 
-            // ✅ NUEVA LÓGICA: Verificar acceso y obtener admin efectivo
             if (!tieneAccesoADatos(userEmail)) {
-                System.out.println("❌ Usuario sin acceso: " + userEmail);
+                System.out.println("Usuario sin acceso: " + userEmail);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -640,7 +630,7 @@ public class SensorDeviceController {
             // Verificar que el dispositivo pertenece al admin efectivo
             Optional<Device> deviceOpt = deviceRepository.findByDeviceCodeAndUserEmail(deviceCode, adminEfectivo);
             if (deviceOpt.isEmpty()) {
-                System.out.println("❌ Dispositivo no encontrado para admin: " + adminEfectivo);
+                System.out.println("Dispositivo no encontrado para admin: " + adminEfectivo);
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -655,7 +645,7 @@ public class SensorDeviceController {
             return ResponseEntity.ok(latestData.get());
 
         } catch (Exception e) {
-            System.out.println("❌ ERROR obteniendo últimos datos: " + e.getMessage());
+            System.out.println("ERROR obteniendo últimos datos: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

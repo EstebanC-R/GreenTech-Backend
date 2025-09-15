@@ -18,10 +18,7 @@ public class AgendaEventoController {
     @Autowired
     private AgendaEventoService agendaService;
 
-    /**
-     * Obtener todos los eventos (con permisos)
-     * GET /api/agenda/eventos
-     */
+
     @GetMapping("/eventos")
     public ResponseEntity<List<AgendaEventoDTO>> getEventos(
             @RequestHeader("Authorization") String authHeader) {
@@ -34,10 +31,6 @@ public class AgendaEventoController {
         }
     }
 
-    /**
-     * Obtener evento específico
-     * GET /api/agenda/eventos/{id}
-     */
     @GetMapping("/eventos/{id}")
     public ResponseEntity<AgendaEventoDTO> getEvento(
             @PathVariable Long id,
@@ -53,10 +46,6 @@ public class AgendaEventoController {
         }
     }
 
-    /**
-     * Crear nuevo evento (solo ADMINISTRADORES)
-     * POST /api/agenda/eventos
-     */
     @PostMapping("/eventos")
     public ResponseEntity<?> crearEvento(
             @Validated(AgendaEventoDTO.Create.class) @RequestBody AgendaEventoDTO createDTO,
@@ -74,10 +63,7 @@ public class AgendaEventoController {
         }
     }
 
-    /**
-     * Actualizar evento (solo ADMINISTRADORES propietarios)
-     * PUT /api/agenda/eventos/{id}
-     */
+
     @PutMapping("/eventos/{id}")
     public ResponseEntity<?> actualizarEvento(
             @PathVariable Long id,
@@ -96,10 +82,7 @@ public class AgendaEventoController {
         }
     }
 
-    /**
-     * Marcar evento como completado
-     * PATCH /api/agenda/eventos/{id}/completar
-     */
+
     @PatchMapping("/eventos/{id}/completar")
     public ResponseEntity<?> completarEvento(
             @PathVariable Long id,
@@ -117,10 +100,6 @@ public class AgendaEventoController {
         }
     }
 
-    /**
-     * Eliminar evento (solo ADMINISTRADORES propietarios)
-     * DELETE /api/agenda/eventos/{id}
-     */
     @DeleteMapping("/eventos/{id}")
     public ResponseEntity<?> eliminarEvento(
             @PathVariable Long id,
@@ -138,10 +117,6 @@ public class AgendaEventoController {
         }
     }
 
-    /**
-     * Obtener estadísticas de la agenda
-     * GET /api/agenda/estadisticas
-     */
     @GetMapping("/estadisticas")
     public ResponseEntity<EstadisticasAgendaDTO> getEstadisticas(
             @RequestHeader("Authorization") String authHeader) {
@@ -154,10 +129,6 @@ public class AgendaEventoController {
         }
     }
 
-    /**
-     * Obtener eventos pendientes
-     * GET /api/agenda/eventos/pendientes
-     */
     @GetMapping("/eventos/pendientes")
     public ResponseEntity<List<AgendaEventoDTO>> getEventosPendientes(
             @RequestHeader("Authorization") String authHeader) {
@@ -170,10 +141,7 @@ public class AgendaEventoController {
         }
     }
 
-    /**
-     * Obtener eventos de hoy
-     * GET /api/agenda/eventos/hoy
-     */
+
     @GetMapping("/eventos/hoy")
     public ResponseEntity<List<AgendaEventoDTO>> getEventosHoy(
             @RequestHeader("Authorization") String authHeader) {

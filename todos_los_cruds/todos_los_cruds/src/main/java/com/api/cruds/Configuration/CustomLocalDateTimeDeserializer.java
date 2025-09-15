@@ -26,17 +26,16 @@ public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateT
             return null;
         }
 
-        // Remover 'Z' al final si existe (indicador UTC)
         if (dateString.endsWith("Z")) {
             dateString = dateString.substring(0, dateString.length() - 1);
         }
 
-        // Intentar parsear con diferentes formatos
+
         for (DateTimeFormatter formatter : FORMATTERS) {
             try {
                 return LocalDateTime.parse(dateString, formatter);
             } catch (DateTimeParseException e) {
-                // Continuar con el siguiente formato
+                System.out.println("Formato no válido con: " + formatter.toString() + " -> " + e.getParsedString());
             }
         }
 

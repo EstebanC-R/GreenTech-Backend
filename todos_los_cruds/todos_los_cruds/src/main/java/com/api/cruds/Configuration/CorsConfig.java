@@ -17,7 +17,7 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .maxAge(3600);
 
-        // Configuración específica para WebSocket si es necesaria
+        // Configuración específica para WebSocket
         registry.addMapping("/ws/**")
                 .allowedOriginPatterns("*")
                 .allowedMethods("*")

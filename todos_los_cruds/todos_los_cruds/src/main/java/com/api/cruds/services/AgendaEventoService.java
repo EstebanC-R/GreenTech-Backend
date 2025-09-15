@@ -135,18 +135,18 @@ public class AgendaEventoService {
     public EstadisticasAgendaDTO getEstadisticas(String token) {
         String userEmail = jwtUtil.extractEmail(token);
 
-        System.out.println("🔧 DEBUG - Email usuario: " + userEmail);
+        System.out.println("DEBUG - Email usuario: " + userEmail);
 
         // CAMBIO PRINCIPAL: Usar List<Object[]> en lugar de Object[]
         List<Object[]> resultList = agendaRepository.getEstadisticasConPermisos(userEmail);
 
-        System.out.println("🔧 DEBUG - Resultado query (List): " + resultList);
-        System.out.println("🔧 DEBUG - List size: " + (resultList != null ? resultList.size() : "null"));
+        System.out.println("DEBUG - Resultado query (List): " + resultList);
+        System.out.println("DEBUG - List size: " + (resultList != null ? resultList.size() : "null"));
 
         if (resultList != null && !resultList.isEmpty()) {
             Object[] stats = resultList.get(0); // Obtener la primera (y única) fila
 
-            System.out.println("🔧 DEBUG - Stats array: " + Arrays.toString(stats));
+            System.out.println("DEBUG - Stats array: " + Arrays.toString(stats));
 
             if (stats != null && stats.length >= 4) {
                 try {
@@ -155,7 +155,7 @@ public class AgendaEventoService {
                     Long eventosCompletados = convertToLong(stats[2]);
                     Long eventosHoy = convertToLong(stats[3]);
 
-                    System.out.println("🔧 DEBUG - Estadísticas convertidas:");
+                    System.out.println("   DEBUG - Estadísticas convertidas:");
                     System.out.println("   totalEventos: " + totalEventos);
                     System.out.println("   eventosPendientes: " + eventosPendientes);
                     System.out.println("   eventosCompletados: " + eventosCompletados);
@@ -170,7 +170,7 @@ public class AgendaEventoService {
             }
         }
 
-        System.out.println("🔧 DEBUG - No se encontraron datos");
+        System.out.println("DEBUG - No se encontraron datos");
         return new EstadisticasAgendaDTO(0L, 0L, 0L, 0L);
     }
 
@@ -201,7 +201,6 @@ public class AgendaEventoService {
                 .collect(Collectors.toList());
     }
 
-    // MÉTODO CONVERTIDOR CORREGIDO - Este era el problema principal
     private AgendaEventoDTO convertToDTO(AgendaEvento evento) {
         return new AgendaEventoDTO(
                 evento.getIdEvento(),

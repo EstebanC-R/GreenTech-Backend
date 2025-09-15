@@ -62,7 +62,6 @@ public class AuthController {
 
             // Validar que el token sea válido antes de hacer logout
             if (!jwtUtil.isTokenExpired(token)) {
-                // En una implementación más robusta, podrías agregar el token a una blacklist
                 return ResponseEntity.ok("Logout exitoso");
             } else {
                 return ResponseEntity.status(401).body("Token expirado");

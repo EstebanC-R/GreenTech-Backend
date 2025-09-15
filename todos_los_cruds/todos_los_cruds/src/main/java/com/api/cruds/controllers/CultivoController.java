@@ -58,7 +58,7 @@ public class CultivoController {
         }
     }
 
-    // Actualizar cultivo - SOLO ADMINISTRADORES
+    // Actualizar cultivo - SOLO ADMINISTRADORESs
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCultivo(
             @RequestHeader("Authorization") String authHeader,

@@ -18,7 +18,6 @@ public class EmpleadoController {
     @Autowired
     private EmpleadoService empleadoService;
 
-    // ✅ INYECTAR EL REPOSITORIO
     @Autowired
     private IEmpleadosRepository empleadosRepository;
 
@@ -59,8 +58,6 @@ public class EmpleadoController {
         Map<String, Boolean> resultado = new HashMap<>();
 
         try {
-            // ✅ USAR LA INSTANCIA DEL REPOSITORIO, NO COMO MÉTODO ESTÁTICO
-
             // Verificar cédula
             if (cedula != null && !cedula.trim().isEmpty()) {
                 boolean cedulaExiste;
@@ -191,7 +188,6 @@ public class EmpleadoController {
         } catch (Exception e) {
             System.err.println("Error al eliminar empleado: " + e.getMessage());
             e.printStackTrace();
-            // Dejar que el GlobalExceptionHandler maneje la excepción
             throw e;
         }
     }

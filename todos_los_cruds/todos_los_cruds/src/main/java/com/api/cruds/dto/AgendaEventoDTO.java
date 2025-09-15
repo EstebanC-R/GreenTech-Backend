@@ -38,7 +38,6 @@ public class AgendaEventoDTO {
     private String tipo = "OTRO";
     private Boolean completado = false;
 
-    // Interfaces para validación
     public interface Create {}
     public interface Update {}
 }
