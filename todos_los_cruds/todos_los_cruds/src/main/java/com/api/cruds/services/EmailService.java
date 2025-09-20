@@ -41,7 +41,7 @@ public class EmailService {
 
     private String createPasswordResetEmailTemplate(String resetUrl) {
         // Logo blanco de GreenTech
-        String logoUrl = "https://i.postimg.cc/43jS8XKv/logo-white-greentech-R.png";
+        String logoUrl = "https://i.ibb.co/Wv3qFYwW/logo-white-greentech-R.png";
 
         return """
             <!DOCTYPE html>
