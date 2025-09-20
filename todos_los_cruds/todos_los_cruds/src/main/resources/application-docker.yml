@@ -3,16 +3,16 @@ spring:
     name: sistema_completo
 
   datasource:
-    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: ${MYSQLUSER}
-    password: ${MYSQLPASSWORD}
+    url: jdbc:mysql://${MYSQLHOST:${SPRING_DATASOURCE_HOST:localhost}}:${MYSQLPORT:${SPRING_DATASOURCE_PORT:3306}}/${MYSQLDATABASE:${SPRING_DATASOURCE_DB:sistema_greentech}}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${MYSQLUSER:${SPRING_DATASOURCE_USERNAME:root}}
+    password: ${MYSQLPASSWORD:${SPRING_DATASOURCE_PASSWORD:1234}}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
     database-platform: org.hibernate.dialect.MySQL8Dialect
-    show-sql: false
+    show-sql: false # ponlo en true si quieres ver las consultas
     properties:
       hibernate:
         format_sql: true

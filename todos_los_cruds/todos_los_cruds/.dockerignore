@@ -1,0 +1,48 @@
+# Archivos y directorios a ignorar en el build de Docker
+
+# Directorio target
+target/
+
+# Logs
+*.log
+logs/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentación
+README.md
+*.md
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+*~
+
+# Node modules (si tienes frontend)
+node_modules/
+
+# Archivos de configuración local
+application-local.yml
+application-dev.yml
+
+# Maven wrapper jar (opcional, puedes incluirlo si quieres)
+# .mvn/wrapper/maven-wrapper.jar

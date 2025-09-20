@@ -36,7 +36,7 @@ public class StudiesFile {
     private Long size;
 
     @Lob
-    @Column(name = "data", nullable = false, columnDefinition = "bytea")
+    @Column(name = "data", nullable = false, columnDefinition = "LONGBLOB")
     private byte[] data;
 
     @Column(name = "created_at", nullable = false)
