@@ -3,7 +3,7 @@ spring:
     name: sistema_completo
 
   datasource:
-    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQL_DATABASE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${MYSQLUSER}
     password: ${MYSQLPASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -51,7 +51,7 @@ server:
 
 app:
   frontend:
-    url: ${APP_FRONTEND_URL:http://localhost:4200}
+    url: ${APP_FRONTEND_URL:https://green-tech-wine.vercel.app}
 
 logging:
   level:
