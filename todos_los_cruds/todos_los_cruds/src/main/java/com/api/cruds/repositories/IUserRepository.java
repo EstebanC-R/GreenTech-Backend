@@ -18,12 +18,12 @@ public interface IUserRepository extends JpaRepository<UserModel, String> {
         SELECT 
             v.usuario_email,
             v.rol_usuario, 
-            v.ESTADO,
+            v.estado,       
             v.admin_asignado,
             v.admin_efectivo,
-            u.FECHA_INGRESO
+            v.fecha_ingreso  
         FROM vista_usuarios_con_admin v
-        JOIN USUARIOS u ON v.usuario_email = u.ID_USUARIO
+        JOIN usuarios u ON v.usuario_email = u.id_usuario
         WHERE v.usuario_email = :email
     """, nativeQuery = true)
     Optional<Object[]> findUserProfileByEmail(@Param("email") String email);
