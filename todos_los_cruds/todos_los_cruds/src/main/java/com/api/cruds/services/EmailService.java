@@ -112,13 +112,13 @@ public class EmailService {
                         color: white;
                         font-size: 28px;
                         font-weight: bold;
-                        flex: 1;
                     }
                     
                     .logo img {
                         width: 40px;
                         height: 40px;
                         object-fit: contain;
+                        margin-left: auto;
                     }
                     
                     .header-subtitle {
