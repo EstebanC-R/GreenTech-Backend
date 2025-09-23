@@ -1,13 +1,11 @@
 spring:
   application:
     name: sistema_completo
-
   datasource:
     url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQL_DATABASE}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: ${MYSQLUSER}
     password: ${MYSQLPASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,15 +16,12 @@ spring:
         format_sql: true
         jdbc:
           time_zone: America/Bogota
-
   jackson:
     time-zone: America/Bogota
-
   servlet:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
-
   websocket:
     allowed-origins: "*"
 
@@ -41,9 +36,9 @@ app:
 # Configuración para Resend
 resend:
   api:
-    key: ${RESEND_API_KEY:re_Ju9WiVuU_S6J6inw9pzAxxr2XebK4zZ5N}
+    key: ${RESEND_API_KEY}
   from:
-    email: ${RESEND_FROM_EMAIL:onboarding@resend.dev}
+    email: ${RESEND_FROM_EMAIL}
 
 logging:
   level:

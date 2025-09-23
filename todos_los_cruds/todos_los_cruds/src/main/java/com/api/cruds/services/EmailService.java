@@ -24,18 +24,11 @@ public class EmailService {
     @Value("${resend.api.key}")
     private String resendApiKey;
 
-    @Value("${resend.from.email:onboarding@resend.dev}")
+    @Value("${resend.from.email}")
     private String fromEmail;
 
     @PostConstruct
     public void init() {
-        logger.info("=== RESEND CONFIG DEBUG ===");
-        logger.info("API Key presente: {}", resendApiKey != null ? "SI" : "NO");
-        logger.info("API Key length: {}", resendApiKey != null ? resendApiKey.length() : 0);
-        logger.info("API Key starts with 're_': {}", resendApiKey != null ? resendApiKey.startsWith("re_") : "NO");
-        logger.info("From Email: {}", fromEmail);
-        logger.info("Frontend URL: {}", frontendUrl);
-
         try {
             this.resend = new Resend(resendApiKey);
             logger.info("Resend client inicializado correctamente");
@@ -45,18 +38,9 @@ public class EmailService {
     }
 
     public void sendPasswordResetEmail(String toEmail, String token) {
-        logger.info("=== EMAIL DEBUG START ===");
-        logger.info("Enviando email a: {}", toEmail);
-        logger.info("Token: {}", token);
-        logger.info("From Email: {}", fromEmail);
-        logger.info("Frontend URL: {}", frontendUrl);
-
         try {
             String resetUrl = frontendUrl + "/reset-password?token=" + token;
-            logger.info("Reset URL generada: {}", resetUrl);
-
             String htmlContent = createPasswordResetEmailTemplate(resetUrl);
-            logger.info("HTML content generado - length: {}", htmlContent.length());
 
             CreateEmailOptions params = CreateEmailOptions.builder()
                     .from(fromEmail)
@@ -65,37 +49,19 @@ public class EmailService {
                     .html(htmlContent)
                     .build();
 
-            logger.info("Parametros del email creados correctamente");
-            logger.info("From: {}", params.getFrom());
-            logger.info("To: {}", params.getTo());
-            logger.info("Subject: {}", params.getSubject());
-
-            logger.info("Enviando email con Resend...");
             CreateEmailResponse data = resend.emails().send(params);
-            logger.info("=== EMAIL SUCCESS ===");
             logger.info("Email enviado exitosamente con ID: {} a {}", data.getId(), toEmail);
 
         } catch (ResendException e) {
-            logger.error("=== RESEND ERROR ===");
-            logger.error("ResendException class: {}", e.getClass().getSimpleName());
-            logger.error("ResendException message: {}", e.getMessage());
-            logger.error("ResendException cause: {}", e.getCause() != null ? e.getCause().getMessage() : "NO CAUSE");
-            logger.error("Full stack trace: ", e);
+            logger.error("Error al enviar email con Resend: {}", e.getMessage(), e);
             throw new RuntimeException("Error al enviar el email de recuperación. Por favor intenta nuevamente.", e);
         } catch (Exception e) {
-            logger.error("=== GENERAL ERROR ===");
-            logger.error("Exception class: {}", e.getClass().getSimpleName());
-            logger.error("Exception message: {}", e.getMessage());
-            logger.error("Exception cause: {}", e.getCause() != null ? e.getCause().getMessage() : "NO CAUSE");
-            logger.error("Full stack trace: ", e);
+            logger.error("Error inesperado al enviar email: {}", e.getMessage(), e);
             throw new RuntimeException("Error inesperado al enviar el email. Por favor intenta nuevamente.", e);
         }
     }
 
     private String createPasswordResetEmailTemplate(String resetUrl) {
-        logger.info("Creando template HTML con resetUrl: {}", resetUrl);
-
-        // Logo blanco de GreenTech
         String logoUrl = "https://i.ibb.co/Wv3qFYwW/logo-white-greentech-R.png";
 
         String template = """
@@ -275,7 +241,7 @@ public class EmailService {
                     <div class="header">
                         <div class="logo">
                             <span class="logo-text">GreenTech</span>
-                            <img src="%s" alt="GreenTech Logo">
+                            <img src="LOGO_URL_PLACEHOLDER" alt="GreenTech Logo">
                         </div>
                         <div class="header-subtitle">Monitoreo de Cultivos</div>
                     </div>
@@ -290,7 +256,7 @@ public class EmailService {
                         </div>
                         
                         <div class="cta-container">
-                            <a href="%s" class="cta-button">
+                            <a href="RESET_URL_PLACEHOLDER" class="cta-button">
                                 🔐 Restablecer mi contraseña
                             </a>
                         </div>
@@ -315,7 +281,7 @@ public class EmailService {
                         <div class="footer-text">
                             ¿Tienes problemas con el botón? Copia y pega este enlace en tu navegador:
                             <br>
-                            <a href="%s" style="color: #2d3748; word-break: break-all;">%s</a>
+                            <a href="RESET_URL_PLACEHOLDER" style="color: #2d3748; word-break: break-all;">RESET_URL_PLACEHOLDER</a>
                         </div>
                         
                         <div class="signature">
@@ -326,9 +292,10 @@ public class EmailService {
                 </div>
             </body>
             </html>
-            """.formatted(logoUrl, resetUrl, resetUrl, resetUrl);
+            """;
 
-        logger.info("Template HTML creado correctamente - length: {}", template.length());
-        return template;
+        return template
+                .replace("LOGO_URL_PLACEHOLDER", logoUrl)
+                .replace("RESET_URL_PLACEHOLDER", resetUrl);
     }
 }
