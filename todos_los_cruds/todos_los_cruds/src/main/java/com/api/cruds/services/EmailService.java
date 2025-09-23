@@ -43,7 +43,7 @@ public class EmailService {
             CreateEmailOptions params = CreateEmailOptions.builder()
                     .from(fromEmail)
                     .to(toEmail)
-                    .subject("🔐 Restablecer Contraseña - GreenTech")
+                    .subject("Restablecer Contraseña - GreenTech")
                     .html(htmlContent)
                     .build();
 
@@ -103,15 +103,15 @@ public class EmailService {
                     .logo {
                         display: flex;
                         align-items: center;
-                        width: 100%%;
+                        width: 100%;
                         margin-bottom: 15px;
-                        justify-content: space-between;
                     }
-                    
+            
                     .logo-text {
                         color: white;
                         font-size: 28px;
                         font-weight: bold;
+                        flex: 1;
                     }
                     
                     .logo img {
