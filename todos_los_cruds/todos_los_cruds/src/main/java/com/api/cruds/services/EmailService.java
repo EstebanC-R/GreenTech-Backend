@@ -29,16 +29,34 @@ public class EmailService {
 
     @PostConstruct
     public void init() {
-        this.resend = new Resend(resendApiKey);
-        logger.info("Resend client inicializado correctamente");
+        logger.info("=== RESEND CONFIG DEBUG ===");
+        logger.info("API Key presente: {}", resendApiKey != null ? "SI" : "NO");
+        logger.info("API Key length: {}", resendApiKey != null ? resendApiKey.length() : 0);
+        logger.info("API Key starts with 're_': {}", resendApiKey != null ? resendApiKey.startsWith("re_") : "NO");
+        logger.info("From Email: {}", fromEmail);
+        logger.info("Frontend URL: {}", frontendUrl);
+
+        try {
+            this.resend = new Resend(resendApiKey);
+            logger.info("Resend client inicializado correctamente");
+        } catch (Exception e) {
+            logger.error("Error inicializando Resend client: {}", e.getMessage(), e);
+        }
     }
 
     public void sendPasswordResetEmail(String toEmail, String token) {
-        logger.info("Iniciando envío de email de recuperación de contraseña a: {}", toEmail);
+        logger.info("=== EMAIL DEBUG START ===");
+        logger.info("Enviando email a: {}", toEmail);
+        logger.info("Token: {}", token);
+        logger.info("From Email: {}", fromEmail);
+        logger.info("Frontend URL: {}", frontendUrl);
 
         try {
             String resetUrl = frontendUrl + "/reset-password?token=" + token;
+            logger.info("Reset URL generada: {}", resetUrl);
+
             String htmlContent = createPasswordResetEmailTemplate(resetUrl);
+            logger.info("HTML content generado - length: {}", htmlContent.length());
 
             CreateEmailOptions params = CreateEmailOptions.builder()
                     .from(fromEmail)
@@ -47,23 +65,40 @@ public class EmailService {
                     .html(htmlContent)
                     .build();
 
+            logger.info("Parametros del email creados correctamente");
+            logger.info("From: {}", params.getFrom());
+            logger.info("To: {}", params.getTo());
+            logger.info("Subject: {}", params.getSubject());
+
+            logger.info("Enviando email con Resend...");
             CreateEmailResponse data = resend.emails().send(params);
+            logger.info("=== EMAIL SUCCESS ===");
             logger.info("Email enviado exitosamente con ID: {} a {}", data.getId(), toEmail);
 
         } catch (ResendException e) {
-            logger.error("Error de Resend al enviar email a {}: {}", toEmail, e.getMessage(), e);
+            logger.error("=== RESEND ERROR ===");
+            logger.error("ResendException class: {}", e.getClass().getSimpleName());
+            logger.error("ResendException message: {}", e.getMessage());
+            logger.error("ResendException cause: {}", e.getCause() != null ? e.getCause().getMessage() : "NO CAUSE");
+            logger.error("Full stack trace: ", e);
             throw new RuntimeException("Error al enviar el email de recuperación. Por favor intenta nuevamente.", e);
         } catch (Exception e) {
-            logger.error("Error inesperado al enviar email a {}: {}", toEmail, e.getMessage(), e);
+            logger.error("=== GENERAL ERROR ===");
+            logger.error("Exception class: {}", e.getClass().getSimpleName());
+            logger.error("Exception message: {}", e.getMessage());
+            logger.error("Exception cause: {}", e.getCause() != null ? e.getCause().getMessage() : "NO CAUSE");
+            logger.error("Full stack trace: ", e);
             throw new RuntimeException("Error inesperado al enviar el email. Por favor intenta nuevamente.", e);
         }
     }
 
     private String createPasswordResetEmailTemplate(String resetUrl) {
+        logger.info("Creando template HTML con resetUrl: {}", resetUrl);
+
         // Logo blanco de GreenTech
         String logoUrl = "https://i.ibb.co/Wv3qFYwW/logo-white-greentech-R.png";
 
-        return """
+        String template = """
             <!DOCTYPE html>
             <html lang="es">
             <head>
@@ -292,5 +327,8 @@ public class EmailService {
             </body>
             </html>
             """.formatted(logoUrl, resetUrl, resetUrl, resetUrl);
+
+        logger.info("Template HTML creado correctamente - length: {}", template.length());
+        return template;
     }
 }
