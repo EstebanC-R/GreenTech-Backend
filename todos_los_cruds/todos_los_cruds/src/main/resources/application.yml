@@ -30,25 +30,6 @@ spring:
   websocket:
     allowed-origins: "*"
 
-  mail:
-    host: smtp.gmail.com
-    port: 465 
-    username: greentechonesystem@gmail.com
-    password: akse nlfy lzun noun
-    properties:
-      mail:
-        smtp:
-          auth: true
-          ssl:
-            enable: true
-          socketFactory:
-            port: 465
-            class: javax.net.ssl.SSLSocketFactory
-            fallback: false
-          connectiontimeout: 30000
-          timeout: 30000
-          writetimeout: 30000
-
 server:
   address: 0.0.0.0
   port: ${PORT:8080}
@@ -56,6 +37,13 @@ server:
 app:
   frontend:
     url: ${APP_FRONTEND_URL:https://green-tech-wine.vercel.app}
+
+# Configuración para Resend
+resend:
+  api:
+    key: ${RESEND_API_KEY:re_SQpnnEPu_88sV3AbuefGv4ukNaLv6NiEX}
+  from:
+    email: ${RESEND_FROM_EMAIL:onboarding@resend.dev}
 
 logging:
   level:

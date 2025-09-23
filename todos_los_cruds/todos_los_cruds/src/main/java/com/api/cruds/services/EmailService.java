@@ -1,41 +1,61 @@
 package com.api.cruds.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.resend.Resend;
+import com.resend.core.exception.ResendException;
+import com.resend.services.emails.model.CreateEmailOptions;
+import com.resend.services.emails.model.CreateEmailResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
+
+    private Resend resend;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
+    @Value("${resend.api.key}")
+    private String resendApiKey;
+
+    @Value("${resend.from.email:onboarding@resend.dev}")
+    private String fromEmail;
+
+    @PostConstruct
+    public void init() {
+        this.resend = new Resend(resendApiKey);
+        logger.info("Resend client inicializado correctamente");
+    }
+
     public void sendPasswordResetEmail(String toEmail, String token) {
+        logger.info("Iniciando envío de email de recuperación de contraseña a: {}", toEmail);
+
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setTo(toEmail);
-            helper.setSubject("🔐 Restablecer Contraseña - GreenTech");
-            helper.setFrom("noreply@greentech.com");
-
             String resetUrl = frontendUrl + "/reset-password?token=" + token;
-
             String htmlContent = createPasswordResetEmailTemplate(resetUrl);
-            helper.setText(htmlContent, true);
 
-            mailSender.send(message);
+            CreateEmailOptions params = CreateEmailOptions.builder()
+                    .from(fromEmail)
+                    .to(toEmail)
+                    .subject("🔐 Restablecer Contraseña - GreenTech")
+                    .html(htmlContent)
+                    .build();
 
-        } catch (MessagingException e) {
-            throw new RuntimeException("Error al enviar el email: " + e.getMessage());
+            CreateEmailResponse data = resend.emails().send(params);
+            logger.info("Email enviado exitosamente con ID: {} a {}", data.getId(), toEmail);
+
+        } catch (ResendException e) {
+            logger.error("Error de Resend al enviar email a {}: {}", toEmail, e.getMessage(), e);
+            throw new RuntimeException("Error al enviar el email de recuperación. Por favor intenta nuevamente.", e);
+        } catch (Exception e) {
+            logger.error("Error inesperado al enviar email a {}: {}", toEmail, e.getMessage(), e);
+            throw new RuntimeException("Error inesperado al enviar el email. Por favor intenta nuevamente.", e);
         }
     }
 
@@ -85,6 +105,7 @@ public class EmailService {
                         align-items: center;
                         width: 100%%;
                         margin-bottom: 15px;
+                        justify-content: space-between;
                     }
                     
                     .logo-text {
@@ -97,7 +118,6 @@ public class EmailService {
                         width: 40px;
                         height: 40px;
                         object-fit: contain;
-                        margin-left: auto; /* empuja el logo a la derecha */
                     }
                     
                     .header-subtitle {
