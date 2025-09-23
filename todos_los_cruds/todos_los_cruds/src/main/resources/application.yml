@@ -41,7 +41,7 @@ app:
 # Configuración para Resend
 resend:
   api:
-    key: ${RESEND_API_KEY:re_SQpnnEPu_88sV3AbuefGv4ukNaLv6NiEX}
+    key: ${RESEND_API_KEY:re_j1ej7NyB_3iiGK9zkWMS6HCiBqVvgAKbL}
   from:
     email: ${RESEND_FROM_EMAIL:onboarding@resend.dev}
 
