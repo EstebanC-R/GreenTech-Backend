@@ -1,149 +1,324 @@
 # 🌱 GreenTech — Backend
 
-Backend de la plataforma **GreenTech**, un sistema orientado al monitoreo ambiental y la gestión de información relacionada con cultivos.
+Backend de la plataforma **GreenTech**, desarrollada para apoyar el monitoreo ambiental y la gestión de información relacionada con cultivos.
 
-Este repositorio contiene los servicios backend responsables de procesar la información utilizada por la plataforma web y gestionar las diferentes funcionalidades del sistema.
+Este proyecto contiene los servicios backend encargados de procesar solicitudes, gestionar la lógica de negocio, persistir información en MySQL y proporcionar comunicación con el frontend mediante APIs y WebSockets.
+
+---
 
 ## 📋 Descripción
 
-GreenTech busca integrar información ambiental y agrícola dentro de una plataforma web para facilitar el seguimiento de cultivos y apoyar la toma de decisiones.
+GreenTech es una plataforma orientada al seguimiento y gestión de información agrícola y ambiental.
 
-El backend proporciona los servicios necesarios para la comunicación con el frontend y la gestión de la información del sistema.
-
-Entre las funcionalidades desarrolladas se encuentran módulos relacionados con:
+El backend proporciona la estructura necesaria para gestionar diferentes módulos de la plataforma, incluyendo información relacionada con:
 
 * 🌱 Cultivos
 * 📦 Insumos
 * 📊 Reportes
 * 📝 Observaciones
 * 💡 Recomendaciones
-* 👥 Empleados y usuarios
+* 👥 Usuarios
 * 📅 Agenda
-* 🔐 Autenticación y autorización
+
+El proyecto también incorpora mecanismos de autenticación, autorización y validación de información.
+
+---
 
 ## 🏗️ Arquitectura
 
-El sistema sigue una arquitectura cliente-servidor en la que el backend expone servicios para ser consumidos por el frontend.
+El backend está organizado siguiendo una separación por responsabilidades, utilizando diferentes capas para facilitar el mantenimiento y evolución del código.
+
+```text
+src/main/java/com/api/cruds/
+
+├── Configuration
+├── controllers
+├── dto
+├── exceptions
+├── models
+├── repositories
+├── services
+└── utils
+```
+
+### Principales responsabilidades
+
+**Controllers**
+
+Reciben y gestionan las solicitudes HTTP provenientes del cliente y exponen los endpoints de la aplicación.
+
+**Services**
+
+Contienen la lógica de negocio y coordinan las operaciones realizadas por la aplicación.
+
+**Repositories**
+
+Gestionan el acceso y persistencia de la información mediante Spring Data JPA.
+
+**Models**
+
+Representan las entidades y estructuras principales utilizadas por el sistema.
+
+**DTO**
+
+Permiten definir los objetos utilizados para el intercambio de información entre las diferentes capas de la aplicación.
+
+**Exceptions**
+
+Centralizan el manejo de excepciones y errores de la aplicación.
+
+**Configuration**
+
+Contiene las configuraciones necesarias para el funcionamiento de diferentes componentes del sistema.
+
+**Utils**
+
+Contiene clases y utilidades auxiliares utilizadas por la aplicación.
+
+---
+
+## 🔄 Flujo general
 
 ```text
 ┌─────────────────────┐
-│       Angular       │
+│      Angular        │
 │      Frontend       │
 └──────────┬──────────┘
            │
            │ HTTP / REST
            ▼
 ┌─────────────────────┐
-│      Spring Boot    │
-│       Backend       │
+│     Controllers     │
 └──────────┬──────────┘
-           │
-           │ JPA / SQL
            ▼
 ┌─────────────────────┐
-│        MySQL        │
-│      Database       │
+│      Services       │
+│    Lógica negocio   │
+└──────────┬──────────┘
+           ▼
+┌─────────────────────┐
+│    Repositories     │
+│    Spring Data JPA  │
+└──────────┬──────────┘
+           ▼
+┌─────────────────────┐
+│       MySQL         │
 └─────────────────────┘
 ```
 
+---
+
 ## 🛠️ Tecnologías
 
-* Java
-* Spring Boot
-* Spring Security
+### Backend
+
+* Java 21
+* Spring Boot 3.3.4
+* Spring Web
 * Spring Data JPA
-* Hibernate
-* REST APIs
-* JWT
-* MySQL
-* SQL
-* Maven
-* Git / GitHub
+* Spring Security
+* Spring WebSocket
+* Spring Validation
 
-## 🔐 Seguridad
-
-La aplicación implementa mecanismos de autenticación y autorización para controlar el acceso a los recursos del sistema.
-
-Se utiliza:
+### Seguridad
 
 * Spring Security
-* JWT
-* Control de acceso basado en roles (RBAC)
+* JSON Web Tokens (JWT)
+* JJWT 0.12.3
 
-Los roles permiten diferenciar las funcionalidades disponibles para los diferentes usuarios de la plataforma.
+### Base de datos
 
-## 📦 Módulos principales
+* MySQL
+* Hibernate / JPA
 
-### 🌱 Cultivos
+### Otras tecnologías y herramientas
 
-Gestión de la información relacionada con los cultivos registrados en la plataforma.
+* Maven
+* Lombok
+* Resend Java
+* Spring Boot DevTools
+* JUnit / Spring Boot Test
+* Docker configuration
 
-### 📦 Insumos
+---
 
-Gestión de los insumos utilizados dentro de los procesos agrícolas.
+## 🔐 Seguridad y autenticación
 
-### 📊 Reportes
+El backend utiliza **Spring Security** junto con **JSON Web Tokens (JWT)** para implementar mecanismos de autenticación y autorización.
 
-Servicios destinados a la consulta y generación de información relacionada con el sistema.
-
-### 📝 Observaciones
-
-Registro y gestión de observaciones realizadas durante el seguimiento de los cultivos.
-
-### 💡 Recomendaciones
-
-Gestión de recomendaciones para apoyar el manejo y seguimiento de los cultivos.
-
-### 👥 Usuarios y empleados
-
-Gestión de usuarios y control de acceso mediante roles.
-
-### 📅 Agenda
-
-Gestión de actividades y eventos relacionados con los cultivos.
-
-## 🗄️ Base de datos
-
-El proyecto utiliza **MySQL** como sistema gestor de base de datos.
-
-La estructura de la base de datos se encuentra incluida dentro del repositorio en:
+La integración de JWT se realiza mediante:
 
 ```text
-BD sistema_greentech
+jjwt-api
+jjwt-impl
+jjwt-jackson
 ```
+
+Esto permite proteger los recursos de la aplicación y controlar el acceso a las funcionalidades que requieren autenticación.
+
+---
+
+## 📡 Comunicación en tiempo real
+
+El proyecto incorpora **Spring WebSocket** para permitir comunicación bidireccional en tiempo real entre el backend y los clientes conectados.
+
+Esto permite utilizar el backend para escenarios donde la información necesita actualizarse sin depender exclusivamente de solicitudes HTTP tradicionales.
+
+---
+
+## 🗄️ Persistencia
+
+La aplicación utiliza **Spring Data JPA** para gestionar la persistencia de información y comunicarse con una base de datos **MySQL**.
+
+La estructura se encuentra organizada mediante:
+
+```text
+Models
+   ↓
+Repositories
+   ↓
+MySQL
+```
+
+Hibernate se utiliza como implementación ORM para facilitar el mapeo entre las entidades Java y las tablas de la base de datos.
+
+---
+
+## ✅ Validación
+
+El proyecto incorpora **Spring Boot Validation** para realizar validaciones sobre los datos recibidos por la aplicación.
+
+Esto permite validar la información antes de procesarla dentro de la lógica de negocio.
+
+---
+
+## 📧 Comunicación por correo
+
+El proyecto incorpora la dependencia **Resend Java**, utilizada para integrar funcionalidades relacionadas con el envío de correos electrónicos desde la aplicación.
+
+---
+
+## 🧪 Pruebas
+
+El proyecto incluye configuración para pruebas mediante:
+
+* Spring Boot Test
+* JUnit
+
+Las pruebas se encuentran dentro de:
+
+```text
+src/test/java/com/api/cruds
+```
+
+---
+
+## 🐳 Docker
+
+El proyecto incluye configuración específica para diferentes entornos mediante:
+
+```text
+application.yml
+application-docker.yml
+.dockerignore
+```
+
+Esto permite separar la configuración utilizada durante el desarrollo de aquella destinada a un entorno basado en Docker.
+
+---
 
 ## 📁 Estructura del proyecto
 
-El repositorio contiene los componentes relacionados con el backend y la estructura de base de datos utilizada por GreenTech.
-
 ```text
-GreenTech-Backend/
-│
-├── BD sistema_greentech/
+todos_los_cruds/
 │
 ├── todos_los_cruds/
-│
-└── ...
+│   │
+│   ├── .mvn/
+│   │   └── wrapper/
+│   │
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/api/cruds/
+│   │   │   │   ├── Configuration/
+│   │   │   │   ├── controllers/
+│   │   │   │   ├── dto/
+│   │   │   │   ├── exceptions/
+│   │   │   │   ├── models/
+│   │   │   │   ├── repositories/
+│   │   │   │   ├── services/
+│   │   │   │   └── utils/
+│   │   │   │
+│   │   │   └── CrudObservacionesApplication.java
+│   │   │
+│   │   └── resources/
+│   │       ├── application.yml
+│   │       └── application-docker.yml
+│   │
+│   ├── src/test/
+│   │
+│   ├── .dockerignore
+│   └── pom.xml
 ```
 
-## 🔗 Frontend
+---
 
-El frontend de la plataforma está desarrollado con Angular y se encuentra en:
+## 🚀 Ejecución local
 
-https://github.com/EstebanC-R/GreenTech
+### Requisitos
 
-## 🚀 Ejecución
+Antes de ejecutar el proyecto necesitas tener instalado:
 
-Clonar el repositorio:
+* Java 21
+* Maven
+* MySQL
+* Git
+
+### Clonar el repositorio
 
 ```bash
 git clone https://github.com/EstebanC-R/GreenTech-Backend.git
-cd GreenTech-Backend
 ```
 
-Configurar la conexión a la base de datos MySQL según el entorno local.
+Ingresar al proyecto:
 
-Posteriormente ejecutar el proyecto Spring Boot desde el IDE o mediante Maven.
+```bash
+cd GreenTech-Backend/todos_los_cruds/todos_los_cruds
+```
+
+### Configurar la base de datos
+
+Configura las credenciales y parámetros de conexión a MySQL de acuerdo con tu entorno local.
+
+La configuración principal se encuentra en:
+
+```text
+src/main/resources/application.yml
+```
+
+### Ejecutar
+
+Mediante Maven:
+
+```bash
+./mvnw spring-boot:run
+```
+
+En Windows:
+
+```bash
+mvnw.cmd spring-boot:run
+```
+
+---
+
+## 🔗 Frontend
+
+El frontend de GreenTech está desarrollado con Angular y se encuentra en:
+
+https://github.com/EstebanC-R/GreenTech
+
+---
 
 ## 👨‍💻 Autor
 
