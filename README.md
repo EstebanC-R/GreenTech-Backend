@@ -1,278 +1,323 @@
 # 🌱 GreenTech — Backend
 
-Backend de la plataforma **GreenTech**, desarrollada para apoyar el monitoreo ambiental y la gestión de información relacionada con cultivos.
+Backend de **GreenTech**, desarrollado con **Java 21 y Spring Boot**, encargado de proporcionar los servicios de la aplicación web para la gestión agrícola, autenticación de usuarios, procesamiento de información de sensores y comunicación en tiempo real.
 
-Este proyecto contiene los servicios backend encargados de procesar solicitudes, gestionar la lógica de negocio, persistir información en MySQL y proporcionar comunicación con el frontend mediante APIs y WebSockets.
-
----
-
-## 📋 Descripción
-
-GreenTech es una plataforma orientada al seguimiento y gestión de información agrícola y ambiental.
-
-El backend proporciona la estructura necesaria para gestionar diferentes módulos de la plataforma, incluyendo información relacionada con:
-
-* 🌱 Cultivos
-* 📦 Insumos
-* 📊 Reportes
-* 📝 Observaciones
-* 💡 Recomendaciones
-* 👥 Usuarios
-* 📅 Agenda
-
-El proyecto también incorpora mecanismos de autenticación, autorización y validación de información.
-
----
-
-## 🏗️ Arquitectura
-
-El backend está organizado siguiendo una separación por responsabilidades, utilizando diferentes capas para facilitar el mantenimiento y evolución del código.
-
-```text
-src/main/java/com/api/cruds/
-
-├── Configuration
-├── controllers
-├── dto
-├── exceptions
-├── models
-├── repositories
-├── services
-└── utils
-```
-
-### Principales responsabilidades
-
-**Controllers**
-
-Reciben y gestionan las solicitudes HTTP provenientes del cliente y exponen los endpoints de la aplicación.
-
-**Services**
-
-Contienen la lógica de negocio y coordinan las operaciones realizadas por la aplicación.
-
-**Repositories**
-
-Gestionan el acceso y persistencia de la información mediante Spring Data JPA.
-
-**Models**
-
-Representan las entidades y estructuras principales utilizadas por el sistema.
-
-**DTO**
-
-Permiten definir los objetos utilizados para el intercambio de información entre las diferentes capas de la aplicación.
-
-**Exceptions**
-
-Centralizan el manejo de excepciones y errores de la aplicación.
-
-**Configuration**
-
-Contiene las configuraciones necesarias para el funcionamiento de diferentes componentes del sistema.
-
-**Utils**
-
-Contiene clases y utilidades auxiliares utilizadas por la aplicación.
-
----
-
-## 🔄 Flujo general
-
-```text
-┌─────────────────────┐
-│      Angular        │
-│      Frontend       │
-└──────────┬──────────┘
-           │
-           │ HTTP / REST
-           ▼
-┌─────────────────────┐
-│     Controllers     │
-└──────────┬──────────┘
-           ▼
-┌─────────────────────┐
-│      Services       │
-│    Lógica negocio   │
-└──────────┬──────────┘
-           ▼
-┌─────────────────────┐
-│    Repositories     │
-│    Spring Data JPA  │
-└──────────┬──────────┘
-           ▼
-┌─────────────────────┐
-│       MySQL         │
-└─────────────────────┘
-```
-
----
+El proyecto está organizado mediante una arquitectura por capas, separando controladores, servicios, repositorios, modelos, DTOs y componentes de configuración.
 
 ## 🛠️ Tecnologías
 
-### Backend
-
-* Java 21
-* Spring Boot 3.3.4
+* **Java 21**
+* **Spring Boot 3.3.4**
 * Spring Web
 * Spring Data JPA
 * Spring Security
 * Spring WebSocket
 * Spring Validation
-
-### Seguridad
-
-* Spring Security
-* JSON Web Tokens (JWT)
-* JJWT 0.12.3
-
-### Base de datos
-
-* MySQL
-* Hibernate / JPA
-
-### Otras tecnologías y herramientas
-
+* **MySQL**
+* **JWT**
 * Maven
 * Lombok
 * Resend Java
-* Spring Boot DevTools
-* JUnit / Spring Boot Test
-* Docker configuration
+* Docker
+* Docker Compose
 
----
+## 📋 Funcionalidades
 
-## 🔐 Seguridad y autenticación
+El backend proporciona servicios para diferentes módulos de GreenTech:
 
-El backend utiliza **Spring Security** junto con **JSON Web Tokens (JWT)** para implementar mecanismos de autenticación y autorización.
+* 🔐 Autenticación y autorización
+* 👤 Gestión de usuarios
+* 🌱 Gestión de cultivos
+* 📦 Gestión de insumos
+* 👥 Gestión de empleados
+* 📝 Gestión de observaciones
+* 📅 Gestión de eventos de agenda
+* 📊 Datos y dispositivos de sensores
+* 📄 Gestión de archivos asociados a empleados
+* 🔑 Recuperación y restablecimiento de contraseñas
+* 📧 Envío de correos electrónicos
+* 🔄 Comunicación mediante WebSocket
 
-La integración de JWT se realiza mediante:
+## 🏗️ Arquitectura por capas
+
+El proyecto separa las responsabilidades principales de la aplicación:
 
 ```text
-jjwt-api
-jjwt-impl
-jjwt-jackson
+                    HTTP Request
+                         │
+                         ▼
+                ┌─────────────────┐
+                │   Controllers   │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │    Services     │
+                └────────┬────────┘
+                         │
+                         ▼
+                ┌─────────────────┐
+                │   Repositories  │
+                └────────┬────────┘
+                         │
+                         ▼
+                    ┌─────────┐
+                    │  MySQL  │
+                    └─────────┘
 ```
 
-Esto permite proteger los recursos de la aplicación y controlar el acceso a las funcionalidades que requieren autenticación.
+Los DTOs se utilizan para representar diferentes estructuras de solicitud y respuesta entre la API y los clientes.
 
----
+## 📁 Organización del código
 
-## 📡 Comunicación en tiempo real
+```text
+com/api/cruds/
+├── Configuration/
+├── controllers/
+├── dto/
+├── exceptions/
+├── models/
+├── repositories/
+├── services/
+└── utils/
+```
 
-El proyecto incorpora **Spring WebSocket** para permitir comunicación bidireccional en tiempo real entre el backend y los clientes conectados.
+### Controllers
 
-Esto permite utilizar el backend para escenarios donde la información necesita actualizarse sin depender exclusivamente de solicitudes HTTP tradicionales.
+Contiene los controladores REST y de comunicación:
 
----
+* `AuthController`
+* `CultivoController`
+* `InsumosController`
+* `EmpleadoController`
+* `ObservationController`
+* `AgendaEventoController`
+* `SensorDeviceController`
+* `EmployeeFilesController`
+* `WebSocketController`
+
+### Services
+
+Contiene la lógica de aplicación para los diferentes módulos:
+
+* `AuthService`
+* `CultivoService`
+* `InsumosService`
+* `EmpleadoService`
+* `ObservationService`
+* `AgendaEventoService`
+* `PasswordResetService`
+* `EmailService`
+* `FileStorageServiceImpl`
+
+### Repositories
+
+Contiene los componentes responsables del acceso a los datos mediante Spring Data JPA.
+
+Entre ellos:
+
+* Usuarios
+* Cultivos
+* Insumos
+* Empleados
+* Observaciones
+* Eventos de agenda
+* Dispositivos
+* Datos de sensores
+* Archivos
+* Tokens de recuperación de contraseña
+
+### DTOs
+
+El proyecto utiliza DTOs para separar los objetos utilizados en las peticiones y respuestas de los modelos persistidos.
+
+Algunos ejemplos:
+
+```text
+LoginRequest
+LoginResponse
+CultivoDTO
+SensorDataRequest
+SensorDataResponse
+DeviceStatusResponse
+UserProfileResponse
+ResetPasswordRequest
+ForgotPasswordRequest
+AgendaEventoDTO
+```
+
+## 🔐 Seguridad
+
+La aplicación utiliza **Spring Security** junto con **JSON Web Tokens (JWT)** para gestionar la autenticación.
+
+El proyecto incluye una utilidad específica:
+
+```text
+JwtUtil.java
+```
+
+y una configuración de seguridad:
+
+```text
+SecurityConfig.java
+```
+
+El flujo general de autenticación puede representarse como:
+
+```text
+Cliente
+   │
+   │ Credenciales
+   ▼
+AuthController
+   │
+   ▼
+AuthService
+   │
+   ▼
+Autenticación
+   │
+   ▼
+JWT
+   │
+   ▼
+Solicitudes protegidas
+```
+
+## 🔄 WebSocket
+
+El backend incorpora comunicación mediante **WebSocket**.
+
+La configuración correspondiente se encuentra en:
+
+```text
+WebSocketConfig.java
+```
+
+y existe un controlador dedicado:
+
+```text
+WebSocketController.java
+```
+
+El frontend utiliza STOMP.js y SockJS para comunicarse con esta funcionalidad.
+
+## 🌡️ Sensores y dispositivos
+
+El backend contempla estructuras específicas para trabajar con dispositivos y datos de sensores:
+
+```text
+Device.java
+SensorData.java
+```
+
+junto con:
+
+```text
+SensorDeviceController.java
+SensorDataRepository.java
+SensorDataRequest.java
+SensorDataResponse.java
+DeviceStatusResponse.java
+DeviceRegistrationRequest.java
+LinkDeviceRequest.java
+```
+
+Esto permite separar la gestión de dispositivos de los datos generados por los sensores.
+
+## 📧 Recuperación de contraseña y correo
+
+El backend implementa funcionalidades relacionadas con recuperación de contraseña mediante:
+
+```text
+PasswordResetService.java
+PasswordResetToken.java
+PasswordResetTokenRepository.java
+ForgotPasswordRequest.java
+ResetPasswordRequest.java
+```
+
+También cuenta con:
+
+```text
+EmailService.java
+```
+
+para las operaciones relacionadas con el envío de correos.
+
+## 📂 Gestión de archivos
+
+El proyecto incorpora almacenamiento y consulta de archivos asociados a empleados.
+
+Entre los componentes relacionados se encuentran:
+
+```text
+EmployeeFilesController.java
+FileStorageService.java
+FileStorageServiceImpl.java
+FileInfoDto.java
+EpsFile.java
+StudiesFile.java
+EpsFileRepository.java
+StudiesFileRepository.java
+```
+
+## ⚠️ Manejo de excepciones
+
+El backend cuenta con un manejador global:
+
+```text
+GlobalExceptionHandler.java
+```
+
+para centralizar el tratamiento de excepciones de la aplicación.
 
 ## 🗄️ Persistencia
 
-La aplicación utiliza **Spring Data JPA** para gestionar la persistencia de información y comunicarse con una base de datos **MySQL**.
+La aplicación utiliza **Spring Data JPA** para la interacción con una base de datos **MySQL**.
 
-La estructura se encuentra organizada mediante:
-
-```text
-Models
-   ↓
-Repositories
-   ↓
-MySQL
-```
-
-Hibernate se utiliza como implementación ORM para facilitar el mapeo entre las entidades Java y las tablas de la base de datos.
-
----
-
-## ✅ Validación
-
-El proyecto incorpora **Spring Boot Validation** para realizar validaciones sobre los datos recibidos por la aplicación.
-
-Esto permite validar la información antes de procesarla dentro de la lógica de negocio.
-
----
-
-## 📧 Comunicación por correo
-
-El proyecto incorpora la dependencia **Resend Java**, utilizada para integrar funcionalidades relacionadas con el envío de correos electrónicos desde la aplicación.
-
----
-
-## 🧪 Pruebas
-
-El proyecto incluye configuración para pruebas mediante:
-
-* Spring Boot Test
-* JUnit
-
-Las pruebas se encuentran dentro de:
+Los modelos de dominio se encuentran separados de los repositorios y servicios:
 
 ```text
-src/test/java/com/api/cruds
+models/
+repositories/
+services/
 ```
-
----
 
 ## 🐳 Docker
 
-El proyecto incluye configuración específica para diferentes entornos mediante:
+El proyecto incluye configuración para ejecución mediante Docker:
 
 ```text
-application.yml
-application-docker.yml
+Dockerfile
+docker-compose.yml
 .dockerignore
+application-docker.yml
 ```
 
-Esto permite separar la configuración utilizada durante el desarrollo de aquella destinada a un entorno basado en Docker.
+Esto permite definir un entorno de ejecución separado de la configuración utilizada durante el desarrollo local.
 
----
+## 🧪 Testing
 
-## 📁 Estructura del proyecto
+El proyecto incluye una estructura de pruebas mediante Spring Boot:
 
 ```text
-todos_los_cruds/
-│
-├── todos_los_cruds/
-│   │
-│   ├── .mvn/
-│   │   └── wrapper/
-│   │
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/api/cruds/
-│   │   │   │   ├── Configuration/
-│   │   │   │   ├── controllers/
-│   │   │   │   ├── dto/
-│   │   │   │   ├── exceptions/
-│   │   │   │   ├── models/
-│   │   │   │   ├── repositories/
-│   │   │   │   ├── services/
-│   │   │   │   └── utils/
-│   │   │   │
-│   │   │   └── CrudObservacionesApplication.java
-│   │   │
-│   │   └── resources/
-│   │       ├── application.yml
-│   │       └── application-docker.yml
-│   │
-│   ├── src/test/
-│   │
-│   ├── .dockerignore
-│   └── pom.xml
+src/test/
+└── java/
+    └── com/api/cruds/
+        └── CrudObservacionesApplicationTests.java
 ```
 
----
+La configuración de testing se encuentra integrada con el proyecto Maven y Spring Boot.
 
-## 🚀 Ejecución local
+## ⚙️ Instalación
 
 ### Requisitos
-
-Antes de ejecutar el proyecto necesitas tener instalado:
 
 * Java 21
 * Maven
 * MySQL
-* Git
+* Docker *(opcional)*
 
 ### Clonar el repositorio
 
@@ -280,29 +325,13 @@ Antes de ejecutar el proyecto necesitas tener instalado:
 git clone https://github.com/EstebanC-R/GreenTech-Backend.git
 ```
 
-Ingresar al proyecto:
+### Entrar al proyecto
 
 ```bash
-cd GreenTech-Backend/todos_los_cruds/todos_los_cruds
+cd GreenTech-Backend/todos_los_cruds
 ```
 
-### Configurar la base de datos
-
-Configura las credenciales y parámetros de conexión a MySQL de acuerdo con tu entorno local.
-
-La configuración principal se encuentra en:
-
-```text
-src/main/resources/application.yml
-```
-
-### Ejecutar
-
-Mediante Maven:
-
-```bash
-./mvnw spring-boot:run
-```
+### Ejecutar con Maven
 
 En Windows:
 
@@ -310,18 +339,24 @@ En Windows:
 mvnw.cmd spring-boot:run
 ```
 
----
+En Linux/macOS:
+
+```bash
+./mvnw spring-boot:run
+```
+
+### Ejecutar con Docker Compose
+
+```bash
+docker compose up --build
+```
 
 ## 🔗 Frontend
 
-El frontend de GreenTech está desarrollado con Angular y se encuentra en:
+El frontend correspondiente se encuentra en:
 
-https://github.com/EstebanC-R/GreenTech
+[GreenTech Frontend](https://github.com/EstebanC-R/GreenTech)
 
----
+## 📌 Proyecto
 
-## 👨‍💻 Autor
-
-**Esteban Castaño Ramirez**
-
-GitHub: https://github.com/EstebanC-R
+GreenTech fue desarrollado como una solución tecnológica para la gestión y monitoreo de información agrícola, integrando una aplicación web Angular con servicios backend desarrollados en Java/Spring Boot, persistencia en MySQL, autenticación mediante JWT y comunicación en tiempo real.
